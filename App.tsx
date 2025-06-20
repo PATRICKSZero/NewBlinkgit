@@ -1,34 +1,26 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActivityIndicator, View } from 'react-native';
-
-// 1. Importe o AuthProvider e o hook useAuth que criamos.
-import { AuthProvider, useAuth } from './context/AuthContext'; 
-
-// 2. Importe seus navegadores de pilha.
+import { StatusBar } from 'expo-status-bar'; 
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { Colors } from './config/colors'; 
 import AuthStack from './navigation/AuthStack';
 import MainAppStack from './navigation/MainAppStack';
 
-/**
- * Este componente interno é o "porteiro". Ele está dentro do AuthProvider,
- * então ele tem acesso ao contexto de autenticação.
- */
+
 const AppNavigator = () => {
-  // 3. Pega o estado do 'user' e 'loading' diretamente do contexto.
-  // Não há mais useState ou useEffect aqui.
   const { user, loading } = useAuth();
 
-  // Mostra uma tela de carregamento apenas na inicialização do app.
+  // Enquanto o AuthProvider verifica o AsyncStorage, exibimos um loading global.
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.primaryBackground }}>
+        <ActivityIndicator size="large" color={Colors.primaryHighlight} />
       </View>
     );
   }
-
-  // 4. O NavigationContainer renderiza o navegador correto baseado no estado 'user'.
-  // Se 'user' tiver um objeto, mostra MainAppStack. Se for nulo, mostra AuthStack.
+  
+  // O NavigationContainer envolve a lógica de troca de navegadores.
   return (
     <NavigationContainer>
       {user ? <MainAppStack /> : <AuthStack />}
@@ -36,15 +28,12 @@ const AppNavigator = () => {
   );
 }
 
-/**
- * Este é o componente principal que será exportado.
- * Sua única responsabilidade é "envolver" toda a aplicação com o AuthProvider.
- */
+
 export default function App() {
   return (
-    // 5. O AuthProvider garante que todos os componentes filhos (como o AppNavigator)
-    // possam acessar o contexto de autenticação (user, login, logout, etc.).
     <AuthProvider>
+      {}
+      <StatusBar style="light" />
       <AppNavigator />
     </AuthProvider>
   );
